@@ -1,0 +1,30 @@
+library(shiny)
+library(shinyjs)
+library(shinydashboard)
+
+UI <- fluidPage(
+     actionButton("get_tweets", "Fetch tweets"),
+     
+     #Set hidden buttons
+     hidden(
+       div(id="status_update",
+           verbatimTextOutput("status")
+           )
+     )
+)
+
+Server <- function(input, output){
+  
+  #get_connected <- reactive({
+    #connect
+  #})
+  
+  observeEvent(input$get_tweets, {
+    #Connect to the API
+    toggle("status_update")
+    output$status <- renderText({"You're now connected to the API"})
+  })
+  
+}
+
+shinyApp(ui = UI, server = Server)
