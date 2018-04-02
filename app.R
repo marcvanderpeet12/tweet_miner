@@ -1,9 +1,11 @@
 library(shiny)
 library(shinyjs)
 library(shinydashboard)
+library(twitteR)
 
 UI <- fluidPage(
-     actionButton("get_tweets", "Fetch tweets"),
+  
+     actionButton("get_tweets", "Connect to the twitter API"),
      numericInput("tweet_amount", "Set the amount of Tweets", 10, min = 10, max = 1000),
      selectInput("tweet_name", "Select the tweeter", selected = NULL, choices = c("@RealDonaldTrump")),
      
@@ -12,14 +14,16 @@ UI <- fluidPage(
        div(id="status_update",
            verbatimTextOutput("status")
            )
+     ),
+     
+     hidden(
+       div(id = "tweet_fetcher",
+           uiOutput("status2")
+           )
      )
 )
 
 Server <- function(input, output){
-  
-  #get_connected <- reactive({
-    #connect
-  #})
   
   #scrape_tweets <- reactive({
     
@@ -32,8 +36,20 @@ Server <- function(input, output){
   
   observeEvent(input$get_tweets, {
     #Connect to the API
+    consumer_key <- "BlVcLSJaMPIq72IN8oQPig9qR"
+    consumer_secret <- "LHoITtaFPu80eF2ppG14ElqEnXNVbH0wMz3THzQHSqh9HDETiw"
+    access_token <- "926479201414385668-gtFFvJNriVbsHbPwBLXJjGWuIbY8Oz3"
+    access_secret <- "ozUPCDKpiw4eWhJcNOE7rh7c7a4KmcNXQGwKTYjMhCiQv"
+    setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret) 
+    
     toggle("status_update")
     output$status <- renderText({"You're now connected to the API"})
+    toggle("tweet_fetcher")
+    output$status2 <- renderUI(actionButton("status2", "Scrape tweets"))
+  })
+  
+  observeEvent(input$status2, {
+    output$status <- renderText({"Scraping"})    
   })
   
 }
