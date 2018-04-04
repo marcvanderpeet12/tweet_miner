@@ -20,7 +20,8 @@ UI <- fluidPage(
        div(id = "tweet_fetcher",
            uiOutput("status2")
            )
-     )
+     ),
+     tableOutput("table_output_trump")
 )
 
 Server <- function(input, output){
@@ -49,9 +50,28 @@ Server <- function(input, output){
   })
   
   observeEvent(input$status2, {
-    output$status <- renderText({"Scraping"})    
+  
+    S = 200 
+    N = 2
+    
+    lats_NY <- c(40.7)
+    long_NY <- c(-73.9)
+    geocode_NY <- paste(lats_NY[1], long_NY[1], paste0(S, "mi"), sep = ",")
+    
+    tweets_NY = searchTwitter(input$tweet_name , lang = "en", n = input$tweet_amount, resultType = "recent", geocode = geocode_NY)
+    
+    donaldtext <- sapply(tweets_NY, function(x) x$getText())
+    donaldtext = unlist(donaldtext)
+    df = data.frame(text = donaldtext)
+    
+    #output$status <- renderText({as.character(length(tweets_NY))}) 
+    output$table_output_trump <- renderTable(
+      df
+    )
+    
   })
   
+
 }
 
 shinyApp(ui = UI, server = Server)
