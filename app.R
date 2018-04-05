@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(stringr)
 library(shinydashboard)
 library(twitteR)
 
@@ -8,8 +9,8 @@ source("function.R")
 
 UI <- fluidPage(
  tabsetPanel( 
+   id = "inTabset",
    tabPanel("Tab 1",
-     actionButton("switch_tab", "Go to the second tab"),
      actionButton("get_tweets", "Connect to the twitter API"),
      numericInput("tweet_amount", "Set the amount of Tweets", 10, min = 10, max = 1000),
      selectInput("tweet_name", "Select the tweeter", selected = NULL, choices = c("@RealDonaldTrump")),
@@ -25,12 +26,11 @@ UI <- fluidPage(
        div(id = "tweet_fetcher",
            uiOutput("status2")
            )
-     ),
-     tableOutput("table_output_trump")
+     )
    ),
    tabPanel("Tab 2",
-      actionButton("get_tweets", "Connect to the twitter API")
-            )
+      tableOutput("table_output_trump")
+   )
  )   
 )
 
@@ -71,6 +71,9 @@ Server <- function(input, output, session){
     output$table_output_trump <- renderTable(
       df_with_sentiment
     )
+    updateTabsetPanel(session, "inTabset",
+                      selected = "Tab 2")
+    
     
   })
   
