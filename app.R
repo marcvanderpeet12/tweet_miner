@@ -3,6 +3,7 @@ library(shinyjs)
 library(stringr)
 library(shinydashboard)
 library(twitteR)
+library(formattable)
 
 setwd("~/tweet_miner")
 source("function.R")
@@ -29,7 +30,8 @@ UI <- fluidPage(
      )
    ),
    tabPanel("Tab 2",
-      tableOutput("table_output_trump")
+      #tableOutput("table_output_trump")
+      formattableOutput("table_output_trump")
    )
  )   
 )
@@ -67,9 +69,11 @@ Server <- function(input, output, session){
     
     df_with_sentiment <- add_sentiment(df)
     
-    #output$status <- renderText({as.character(length(tweets_NY))}) 
-    output$table_output_trump <- renderTable(
-      df_with_sentiment
+    #-wa Stackoverflow om  kleuren te veranderen,  archiveren
+    output$table_output_trump <- renderFormattable(
+      formattable(df_with_sentiment, list(
+        sentiment = color_tile("green", "red")
+      ))
     )
     updateTabsetPanel(session, "inTabset",
                       selected = "Tab 2")
